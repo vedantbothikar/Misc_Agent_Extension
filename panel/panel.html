@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat & Image Panel</title>
+    <link rel="stylesheet" href="../css/panel.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Left side chat panel (1/3 width) -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <h2>AgentForce Assistant</h2>
+          <button id="new-chat-button">New Chat</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <!-- Messages will be dynamically inserted here -->
+          <div class="message system-message">
+            <p>Welcome to AgentForce Assistant!</p>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <textarea
+            id="chat-input"
+            placeholder="Type your message here..."
+          ></textarea>
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+
+      <!-- Right side visual workflow (2/3 width) -->
+      <div class="image-container">
+        <h2>Visual Workflow</h2>
+        <div class="image-wrapper">
+          <!-- Default iframe - shown initially -->
+          <div id="default-workflow" class="iframe-container active">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://miro.com/app/live-embed/uXjVItcvKn4=/?embedMode=view_only_without_ui&moveToViewport=-517,-73,2257,930&embedId=421401446942"
+              frameborder="0"
+              scrolling="no"
+              allow="fullscreen; clipboard-read; clipboard-write"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <!-- Agent creation workflow - shown when user types "create an agent" -->
+          <div id="agent-workflow" class="iframe-container">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://miro.com/app/live-embed/uXjVItdaqrY=/?embedMode=view_only_without_ui&moveToViewport=2805,865,2179,655&embedId=688642670240"
+              frameborder="0"
+              scrolling="no"
+              allow="fullscreen; clipboard-read; clipboard-write"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom buttons section -->
+    <div class="button-container">
+      <div class="action-buttons-left">
+        <button class="action-button" id="button1">
+          Quick Create Basic Agent!
+        </button>
+        <button class="action-button" id="button2">
+          Quick Create Sales Agent!
+        </button>
+        <button class="action-button" id="button3">
+          Quick Create Support Agent!
+        </button>
+      </div>
+      <div class="status-buttons-right">
+        <button class="status-button status-green" id="status1">
+          Status 1
+        </button>
+        <button class="status-button status-blue" id="status2">Status 2</button>
+        <button class="status-button status-orange" id="status3">
+          Status 3
+        </button>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/panel.js"></script>
+  </body>
+</html>
