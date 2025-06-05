@@ -223,10 +223,13 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm creating a basic agent for you. This agent will handle general queries and can be customized further."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a basic agent that will handle general queries and can be customized further."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
+
+        // Highlight the "New agent" button instead of clicking it
+        simulateClickOnNewAgentButton();
         break;
       case 2:
         addMessageToChat(
@@ -235,10 +238,13 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm creating a specialized Sales agent for you. This agent will be optimized for lead qualification, follow-ups, and sales conversations."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a specialized Sales agent that will be optimized for lead qualification, follow-ups, and sales conversations."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
+
+        // Highlight the "New agent" button instead of clicking it
+        simulateClickOnNewAgentButton();
         break;
       case 3:
         addMessageToChat(
@@ -247,10 +253,13 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm creating a Support agent for you. This agent will be optimized for customer service, troubleshooting, and issue resolution."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a Support agent that will be optimized for customer service, troubleshooting, and issue resolution."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
+
+        // Highlight the "New agent" button instead of clicking it
+        simulateClickOnNewAgentButton();
         break;
     }
 
@@ -275,6 +284,136 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     saveChatHistory();
+  }
+
+  /**
+   * Highlight the "New agent" button on the webpage to guide the user
+   */
+  function simulateClickOnNewAgentButton() {
+    // Execute a content script that finds and highlights the "New agent" button
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const activeTab = tabs[0];
+      if (activeTab) {
+        chrome.scripting.executeScript(
+          {
+            target: { tabId: activeTab.id },
+            function: highlightNewAgentButton,
+          },
+          function (results) {
+            if (chrome.runtime.lastError) {
+              console.error(
+                "Error executing script:",
+                chrome.runtime.lastError.message
+              );
+              addMessageToChat(
+                "system",
+                "Failed to highlight the 'New agent' button. Please find it manually."
+              );
+            } else {
+              console.log("Button highlight script executed successfully");
+              addMessageToChat(
+                "system",
+                "Please click the highlighted 'New agent' button to create your agent."
+              );
+            }
+          }
+        );
+      } else {
+        console.error("No active tab found");
+        addMessageToChat(
+          "system",
+          "No active tab found. Please navigate to the agent creation page first."
+        );
+      }
+    });
+  }
+
+  /**
+   * Function to be executed in the context of the web page to find and highlight the "New agent" button
+   */
+  function highlightNewAgentButton() {
+    const newAgentButton = document.querySelector(
+      '[data-e2e="gen_ai_agentbuilder-add-new-item"] button'
+    );
+
+    if (newAgentButton) {
+      // Create a pulsating highlight effect around the button
+      newAgentButton.style.outline = "4px solid #ff4d4f";
+      newAgentButton.style.boxShadow = "0 0 10px #ff4d4f";
+      newAgentButton.style.transition = "all 0.5s";
+      newAgentButton.style.position = "relative";
+
+      // Add a tooltip above the button
+      const tooltip = document.createElement("div");
+      tooltip.textContent = "Click here to create a new agent!";
+      tooltip.style.position = "absolute";
+      tooltip.style.top = "-40px";
+      tooltip.style.left = "50%";
+      tooltip.style.transform = "translateX(-50%)";
+      tooltip.style.backgroundColor = "#ff4d4f";
+      tooltip.style.color = "white";
+      tooltip.style.padding = "5px 10px";
+      tooltip.style.borderRadius = "4px";
+      tooltip.style.fontSize = "14px";
+      tooltip.style.fontWeight = "bold";
+      tooltip.style.zIndex = "1000";
+      tooltip.style.whiteSpace = "nowrap";
+
+      // Add arrow pointing to the button
+      tooltip.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+      tooltip.style.position = "absolute";
+      tooltip.style.opacity = "0";
+      tooltip.style.animation = "fadeIn 0.5s forwards";
+
+      // Create and add a style element for the animation
+      const styleEl = document.createElement("style");
+      styleEl.textContent = `
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translate(-50%, 10px); }
+          100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+        @keyframes pulse {
+          0% { box-shadow: 0 0 5px #ff4d4f; }
+          50% { box-shadow: 0 0 15px #ff4d4f, 0 0 20px #ff7875; }
+          100% { box-shadow: 0 0 5px #ff4d4f; }
+        }
+      `;
+      document.head.appendChild(styleEl);
+
+      // Add pulsating effect
+      newAgentButton.style.animation = "pulse 1.5s infinite";
+
+      // Get the parent container with positioning to add the tooltip
+      let container = newAgentButton.parentElement;
+      if (container) {
+        if (window.getComputedStyle(container).position === "static") {
+          container.style.position = "relative";
+        }
+        container.appendChild(tooltip);
+      } else {
+        // If no suitable parent, add tooltip to the button itself
+        newAgentButton.appendChild(tooltip);
+      }
+
+      // Set a timeout to remove the highlight after 10 seconds
+      setTimeout(() => {
+        newAgentButton.style.outline = "";
+        newAgentButton.style.boxShadow = "";
+        newAgentButton.style.animation = "";
+        if (tooltip.parentNode) {
+          tooltip.parentNode.removeChild(tooltip);
+        }
+        if (styleEl.parentNode) {
+          styleEl.parentNode.removeChild(styleEl);
+        }
+      }, 10000);
+
+      console.log('Successfully highlighted the "New agent" button');
+      return true;
+    } else {
+      console.error('Could not find the "New agent" button on the page');
+      return false;
+    }
   }
 
   /**
