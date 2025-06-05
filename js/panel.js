@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a basic agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a basic agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' and pre-fill the agent description for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a specialized Sales agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a specialized Sales agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' and pre-fill the agent description for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a Support agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a Support agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' and pre-fill the agent description for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
               console.log("Button highlight script executed successfully");
               addMessageToChat(
                 "system",
-                "Please click the highlighted 'New agent' button. You'll be redirected to the wizard page, and the 'Create with Gen AI' option will be selected automatically."
+                "Please click the highlighted 'New agent' button. You'll be redirected to the wizard page, and the 'Create with Gen AI' option will be selected automatically. I'll also pre-fill the agent description for you."
               );
             }
           }
