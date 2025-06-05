@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a basic agent that will handle general queries and can be customized further."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a basic agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a specialized Sales agent that will be optimized for lead qualification, follow-ups, and sales conversations."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a specialized Sales agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         addMessageToChat(
           "bot",
-          "I'm highlighting the 'New agent' button for you. Please click it to create a Support agent that will be optimized for customer service, troubleshooting, and issue resolution."
+          "I'm highlighting the 'New agent' button for you. Please click it to create a Support agent. You'll be redirected to the wizard and I'll automatically select 'Create with Gen AI' for you."
         );
         // Show agent creation workflow when creating an agent
         showAgentWorkflow();
@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
               console.log("Button highlight script executed successfully");
               addMessageToChat(
                 "system",
-                "Please click the highlighted 'New agent' button to create your agent."
+                "Please click the highlighted 'New agent' button. You'll be redirected to the wizard page, and the 'Create with Gen AI' option will be selected automatically."
               );
             }
           }
@@ -329,7 +329,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Function to be executed in the context of the web page to find and highlight the "New agent" button
+   * Function to be executed in the context of the web page to find and highlight the "New agent" button,
+   * then redirect to the wizard URL when clicked
    */
   function highlightNewAgentButton() {
     const newAgentButton = document.querySelector(
@@ -395,6 +396,30 @@ document.addEventListener("DOMContentLoaded", function () {
         newAgentButton.appendChild(tooltip);
       }
 
+      // When user clicks the button, redirect to the wizard URL
+      newAgentButton.addEventListener("click", function (e) {
+        // Prevent the default action to avoid normal navigation
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get the current host URL
+        const currentHostUrl = window.location.host;
+
+        // Create the redirect URL
+        const redirectUrl = `https://${currentHostUrl}/AiCopilot/copilotStudio.app#/copilot/wizard?mode=newAgent`;
+
+        console.log(`Redirecting to: ${redirectUrl}`);
+
+        // Store the redirect URL in session storage for the next page to read
+        sessionStorage.setItem("agentforceRedirectUrl", redirectUrl);
+        sessionStorage.setItem("agentforceNeedsAIButtonClick", "true");
+
+        // Redirect to the wizard URL
+        window.location.href = redirectUrl;
+
+        return true;
+      });
+
       // Set a timeout to remove the highlight after 10 seconds
       setTimeout(() => {
         newAgentButton.style.outline = "";
@@ -408,12 +433,81 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }, 10000);
 
+      // Also set up a MutationObserver to detect URL changes and click the Gen AI button if needed
+      setupGenAIButtonObserver();
+
       console.log('Successfully highlighted the "New agent" button');
       return true;
     } else {
       console.error('Could not find the "New agent" button on the page');
       return false;
     }
+  }
+
+  /**
+   * Set up an observer to detect when we're on the wizard page to click the "Create with Gen AI" button
+   */
+  function setupGenAIButtonObserver() {
+    // Check if we are on the wizard page and need to click the AI button
+    if (
+      window.location.href.includes("/copilot/wizard?mode=newAgent") &&
+      sessionStorage.getItem("agentforceNeedsAIButtonClick") === "true"
+    ) {
+      // Clear the flag to avoid repeated clicks
+      sessionStorage.removeItem("agentforceNeedsAIButtonClick");
+
+      // Add a delay to allow the page to fully load
+      setTimeout(clickGenAIButton, 1500);
+
+      // Also set up a mutation observer to keep trying if the button isn't immediately available
+      const observer = new MutationObserver(function (mutations) {
+        clickGenAIButton();
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Stop observing after 10 seconds to prevent resource waste
+      setTimeout(() => observer.disconnect(), 10000);
+    }
+  }
+
+  /**
+   * Try to find and click the "Create with Gen AI" button
+   */
+  function clickGenAIButton() {
+    // Look for the "Create with Gen AI" input or label using various selectors
+    const genAIOption = document.querySelector(
+      'input[aria-label="Create with Gen AI"]'
+    );
+    const genAILabel = document.querySelector(
+      'label[for^="agentWithAIAssist-"]'
+    );
+
+    // Try to click on the appropriate element
+    if (genAIOption) {
+      console.log('Found "Create with Gen AI" input, clicking it...');
+      genAIOption.click();
+      return true;
+    } else if (genAILabel) {
+      console.log('Found "Create with Gen AI" label, clicking it...');
+      genAILabel.click();
+      return true;
+    } else {
+      // Try a broader selector if the specific ones failed
+      const sparklesIcon = document.querySelector(
+        ".slds-icon-utility-sparkles"
+      );
+      if (sparklesIcon && sparklesIcon.closest("label")) {
+        console.log("Found sparkles icon, clicking its label...");
+        sparklesIcon.closest("label").click();
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
