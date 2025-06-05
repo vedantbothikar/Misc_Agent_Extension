@@ -312,6 +312,11 @@
           nextButton.style.backgroundColor = originalBackgroundColor;
           nextButton.style.transition = originalTransition;
         }, 300);
+
+        // After clicking the "CustomizeYourAgent Next" button, click the AddTopicsNext button after a delay
+        setTimeout(() => {
+          clickAddTopicsNextButton();
+        }, 2000);
       }, 300);
 
       return true;
@@ -333,6 +338,282 @@
 
       // Stop observing after 10 seconds
       setTimeout(() => nextButtonObserver.disconnect(), 10000);
+
+      return false;
+    }
+  }
+
+  /**
+   * Function to click the "Next" button on the Add Topics screen
+   * This is called "AddTopicsNext" button
+   */
+  function clickAddTopicsNextButton() {
+    console.log("Attempting to click the AddTopicsNext button...");
+
+    // Try different selectors for the Next button
+    const nextButtonSelectors = [
+      'lightning-button[data-id="nextButton"] button',
+      "button.slds-button_brand:not([disabled])",
+      "button.slds-button.slds-button_brand:not([disabled])",
+      'button[type="button"][part="button"]:not([disabled])',
+      'button:contains("Next")',
+    ];
+
+    let nextButton = null;
+
+    // Try each selector
+    for (const selector of nextButtonSelectors) {
+      try {
+        // For the contains selector, we need a different approach
+        if (selector.includes(":contains")) {
+          const allButtons = document.querySelectorAll("button");
+          for (const btn of allButtons) {
+            if (btn.textContent.trim() === "Next" && !btn.disabled) {
+              nextButton = btn;
+              console.log(
+                `Found AddTopicsNext button using text content matching`
+              );
+              break;
+            }
+          }
+        } else {
+          nextButton = document.querySelector(selector);
+        }
+
+        if (nextButton) {
+          console.log(`Found AddTopicsNext button using selector: ${selector}`);
+          break;
+        }
+      } catch (e) {
+        console.log(`Error with selector ${selector}:`, e);
+      }
+    }
+
+    // If we still don't have the button, try a more general approach
+    if (!nextButton) {
+      console.log("Trying to find AddTopicsNext button via broader search...");
+
+      // Find all buttons with "Next" text that are not disabled
+      const allButtons = document.querySelectorAll("button");
+      for (const btn of allButtons) {
+        if (btn.textContent.trim() === "Next" && !btn.disabled) {
+          nextButton = btn;
+          console.log("Found AddTopicsNext button via text content search");
+          break;
+        }
+      }
+
+      // If still not found, try looking for lightning-button with "Next"
+      if (!nextButton) {
+        const lightningButtons = document.querySelectorAll("lightning-button");
+        for (const lb of lightningButtons) {
+          if (lb.textContent && lb.textContent.includes("Next")) {
+            // Try to find the actual button inside
+            const btn = lb.querySelector("button:not([disabled])");
+            if (btn) {
+              nextButton = btn;
+              console.log("Found AddTopicsNext button inside lightning-button");
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // If we found a button, click it
+    if (nextButton) {
+      // Add a visual indicator that we're clicking the button
+      const originalBackgroundColor = nextButton.style.backgroundColor;
+      const originalTransition = nextButton.style.transition;
+
+      // Apply a brief animation to show the click
+      nextButton.style.transition = "background-color 0.3s ease";
+      nextButton.style.backgroundColor = "#76b900";
+
+      setTimeout(() => {
+        // Click the button
+        console.log("Clicking the AddTopicsNext button");
+        nextButton.click();
+
+        // Also try dispatch events in case click doesn't work
+        nextButton.dispatchEvent(
+          new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+
+        // Restore original style after a delay
+        setTimeout(() => {
+          nextButton.style.backgroundColor = originalBackgroundColor;
+          nextButton.style.transition = originalTransition;
+        }, 300);
+
+        // After clicking the "AddTopicsNext" button, click the Create button after a delay
+        setTimeout(() => {
+          clickCreateButton();
+        }, 2000);
+      }, 300);
+
+      return true;
+    } else {
+      console.log("Could not find the AddTopicsNext button");
+
+      // Set up an observer to find the button when it becomes available
+      const nextButtonObserver = new MutationObserver(function () {
+        const found = clickAddTopicsNextButton();
+        if (found) {
+          nextButtonObserver.disconnect();
+        }
+      });
+
+      nextButtonObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Stop observing after 10 seconds
+      setTimeout(() => nextButtonObserver.disconnect(), 10000);
+
+      return false;
+    }
+  }
+
+  /**
+   * Function to click the final "Create" button on the last screen
+   */
+  function clickCreateButton() {
+    console.log("Attempting to click the Create button...");
+
+    // Try different selectors for the Create button
+    const createButtonSelectors = [
+      'lightning-button[data-id="nextButton"] button',
+      "button.slds-button_brand:not([disabled])",
+      "button.slds-button.slds-button_brand:not([disabled])",
+      'button[type="button"][part="button"]:not([disabled])',
+      'button:contains("Create")',
+    ];
+
+    let createButton = null;
+
+    // Try each selector
+    for (const selector of createButtonSelectors) {
+      try {
+        // For the contains selector, we need a different approach
+        if (selector.includes(":contains")) {
+          const allButtons = document.querySelectorAll("button");
+          for (const btn of allButtons) {
+            if (btn.textContent.trim() === "Create" && !btn.disabled) {
+              createButton = btn;
+              console.log(`Found Create button using text content matching`);
+              break;
+            }
+          }
+        } else {
+          // For other selectors, first get all matching buttons
+          const buttons = document.querySelectorAll(selector);
+          for (const btn of buttons) {
+            // Check if any of these buttons has "Create" text
+            if (btn.textContent.trim() === "Create") {
+              createButton = btn;
+              console.log(`Found Create button using selector: ${selector}`);
+              break;
+            }
+          }
+        }
+
+        if (createButton) {
+          break;
+        }
+      } catch (e) {
+        console.log(`Error with selector ${selector}:`, e);
+      }
+    }
+
+    // If we still don't have the button, try a more general approach
+    if (!createButton) {
+      console.log("Trying to find Create button via broader search...");
+
+      // Find all buttons with "Create" text that are not disabled
+      const allButtons = document.querySelectorAll("button");
+      for (const btn of allButtons) {
+        if (btn.textContent.trim() === "Create" && !btn.disabled) {
+          createButton = btn;
+          console.log("Found Create button via text content search");
+          break;
+        }
+      }
+
+      // If still not found, try looking for lightning-button with "Create"
+      if (!createButton) {
+        const lightningButtons = document.querySelectorAll("lightning-button");
+        for (const lb of lightningButtons) {
+          if (lb.textContent && lb.textContent.includes("Create")) {
+            // Try to find the actual button inside
+            const btn = lb.querySelector("button:not([disabled])");
+            if (btn) {
+              createButton = btn;
+              console.log("Found Create button inside lightning-button");
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // If we found a button, click it
+    if (createButton) {
+      // Add a visual indicator that we're clicking the button
+      const originalBackgroundColor = createButton.style.backgroundColor;
+      const originalTransition = createButton.style.transition;
+
+      // Apply a brief animation to show the click
+      createButton.style.transition = "background-color 0.3s ease";
+      createButton.style.backgroundColor = "#76b900";
+
+      setTimeout(() => {
+        // Click the button
+        console.log("Clicking the Create button");
+        createButton.click();
+
+        // Also try dispatch events in case click doesn't work
+        createButton.dispatchEvent(
+          new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+
+        // Restore original style after a delay
+        setTimeout(() => {
+          createButton.style.backgroundColor = originalBackgroundColor;
+          createButton.style.transition = originalTransition;
+        }, 300);
+
+        console.log("Create button clicked, agent creation process complete!");
+      }, 300);
+
+      return true;
+    } else {
+      console.log("Could not find the Create button");
+
+      // Set up an observer to find the button when it becomes available
+      const createButtonObserver = new MutationObserver(function () {
+        const found = clickCreateButton();
+        if (found) {
+          createButtonObserver.disconnect();
+        }
+      });
+
+      createButtonObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Stop observing after 10 seconds
+      setTimeout(() => createButtonObserver.disconnect(), 10000);
 
       return false;
     }
