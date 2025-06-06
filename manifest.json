@@ -4,11 +4,18 @@
   "description": "AgentForce Assistant is a Chrome extension that enhances your browsing experience with AI-powered features.",
   "manifest_version": 3,
   "devtools_page": "devtools.html",
-  "permissions": ["storage", "scripting"],
+  "permissions": ["storage", "scripting", "tabs"],
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
     "128": "images/icon128.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content-script.js"],
+      "run_at": "document_end"
+    }
+  ]
 }
