@@ -16,6 +16,15 @@
   const companyDescription =
     "Vacations, Resorts, tours, whatever you want, we are the Answer! We have weekly, monthly, as well as annual packages that you may like";
 
+  // Generate a unique API name based on timestamp
+  function generateUniqueApiName() {
+    // Use timestamp to ensure uniqueness
+    const timestamp = new Date().getTime().toString().slice(-6);
+    // return `Customer_Care_Agent_${timestamp}`;
+    console.log("Timestamp for API Name:", timestamp);
+    return `Customer_Care_Agent_${timestamp}`;
+  }
+
   /**
    * Function to populate the company information fields after the "Next" button is clicked
    */
@@ -39,6 +48,24 @@
         companyNameInput = document.querySelector(selector);
         if (companyNameInput) {
           console.log(`Found company name input using selector: ${selector}`);
+          break;
+        }
+      }
+
+      // Try to find the API Name input field
+      const apiNameSelectors = [
+        'input[placeholder="Enter API Name"]',
+        "#input-106",
+        "input.slds-input[required]",
+      ];
+
+      let apiNameInput = null;
+
+      // Try each API name selector
+      for (const selector of apiNameSelectors) {
+        apiNameInput = document.querySelector(selector);
+        if (apiNameInput) {
+          console.log(`Found API name input using selector: ${selector}`);
           break;
         }
       }
@@ -101,6 +128,25 @@
         }
       }
 
+      // If API Name field wasn't found, try a broader approach
+      if (!apiNameInput) {
+        console.log("Trying broader search for API Name input...");
+        const allInputs = document.querySelectorAll('input[type="text"]');
+        for (const input of allInputs) {
+          if (
+            input.placeholder === "Enter API Name" ||
+            input.id === "input-106" ||
+            (input.required &&
+              input.className.includes("slds-input") &&
+              !input.placeholder?.includes("company"))
+          ) {
+            apiNameInput = input;
+            console.log("Found API Name input via broader search");
+            break;
+          }
+        }
+      }
+
       // Populate company name if found
       if (companyNameInput) {
         companyNameInput.value = companyName;
@@ -125,15 +171,35 @@
         companyDescriptionTextarea.focus();
         companyDescriptionTextarea.blur();
         console.log("Populated company description field");
+      } else {
+        console.log("Could not find company description textarea");
+      }
 
-        // If both fields are populated, click the Next button after a short delay
-        if (companyNameInput) {
+      // Populate API Name if found
+      if (apiNameInput) {
+        const uniqueApiName = generateUniqueApiName();
+        apiNameInput.value = uniqueApiName;
+        apiNameInput.dispatchEvent(new Event("input", { bubbles: true }));
+        apiNameInput.dispatchEvent(new Event("change", { bubbles: true }));
+        apiNameInput.focus();
+        apiNameInput.blur();
+        console.log(`Populated API Name field with: ${uniqueApiName}`);
+
+        // If all fields are populated, click the Next button after a short delay
+        if (companyNameInput && companyDescriptionTextarea) {
           setTimeout(() => {
             clickCustomizeYourAgentNextButton();
           }, 1000);
         }
       } else {
-        console.log("Could not find company description textarea");
+        console.log("Could not find API Name input field");
+
+        // If API Name wasn't found but other fields were, still try to proceed
+        if (companyNameInput && companyDescriptionTextarea) {
+          setTimeout(() => {
+            clickCustomizeYourAgentNextButton();
+          }, 1000);
+        }
       }
 
       // Set up an observer to try again if not found initially
@@ -182,11 +248,30 @@
             }
           }
 
-          // If both fields were found, disconnect the observer
+          // Try to find API Name input if it wasn't found before
+          if (!apiNameInput) {
+            apiNameInput = document.querySelector(
+              'input[placeholder="Enter API Name"], #input-106'
+            );
+            if (apiNameInput) {
+              const uniqueApiName = generateUniqueApiName();
+              apiNameInput.value = uniqueApiName;
+              apiNameInput.dispatchEvent(new Event("input", { bubbles: true }));
+              apiNameInput.dispatchEvent(
+                new Event("change", { bubbles: true })
+              );
+              foundMissing = true;
+              console.log(
+                `Found and populated API Name field via observer with: ${uniqueApiName}`
+              );
+            }
+          }
+
+          // If all fields were found, disconnect the observer
           if (companyNameInput && companyDescriptionTextarea) {
             companyInfoObserver.disconnect();
             console.log(
-              "Both company fields found and populated, observer disconnected"
+              "Required fields found and populated, observer disconnected"
             );
 
             // Try to click the Next button after fields are populated
